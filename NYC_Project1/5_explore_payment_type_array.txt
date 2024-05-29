@@ -1,25 +1,102 @@
-USE nyc_taxi_discovery
+-- This is auto-generated code
+SELECT TOP 100
+    jsonContent
+/* --> place the keys that you see in JSON documents in the WITH clause:
+       , JSON_VALUE (jsonContent, '$.key1') AS header1
+       , JSON_VALUE (jsonContent, '$.key2') AS header2
+*/
+FROM
+    OPENROWSET(
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/payment_type_array.json',
+        FORMAT = 'CSV',
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0b'
+    )
+    WITH (
+        jsonContent varchar(MAX)
+    ) AS [result]
 
-SELECT payment_type, sub_type, value
+
+--2
+USE nyc_taxi_discovery
+SELECT TOP 100
+    JSON_VALUE(jsonDsc, '$.payment_type') as payment_type,
+    JSON_VALUE(jsonDsc, '$.payment_type_desc') as payment_type_desc
 FROM
     OPENROWSET(
         BULK 'payment_type_array.json',
         DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
+        --PARSER_VERSION = '1.0',--by default csv use PARSER_VERSION = '1.0', with '2.0' coming error because not support json related files
+        --'
         FIELDQUOTE = '0x0b',
         FIELDTERMINATOR ='0x0b',
-        ROWTERMINATOR = '0x0a'
+        ROWTERMINATOR = '0x0a'--'0x0b'single line, and '0x0b'-multy line
     )
     WITH (
-        jsonDoc nvarchar(MAX)
+        jsonDsc nvarchar(MAX)
     ) AS Payment_Type
-    CROSS APPLY OPENJSON(jsonDoc)
+
+
+--3
+USE nyc_taxi_discovery
+SELECT TOP 100 *
+    --JSON_VALUE(jsonDsc, '$.payment_type') as payment_type,
+    --JSON_VALUE(jsonDsc, '$.payment_type_desc') as payment_type_desc
+FROM
+    OPENROWSET(
+        BULK 'payment_type_array.json',
+        DATA_SOURCE = 'nyc_taxi_data_raw',
+        FORMAT = 'CSV',
+        --PARSER_VERSION = '1.0',--by default csv use PARSER_VERSION = '1.0', with '2.0' coming error because not support json related files
+        --'
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0a'--'0x0b'single line, and '0x0b'-multy line
+    )
+    WITH (
+        jsonDsc nvarchar(MAX)
+    ) AS Payment_Type
+    CROSS APPLY OPENJSON(jsonDsc)
     WITH(
         payment_type SMALLINT,
-        payment_type_desc NVARCHAR(MAX) AS json
+        payment_type_desc NVARCHAR(MAX) AS JSON
     ) AS payment_type_desc
     CROSS APPLY OPENJSON(payment_type_desc)
     WITH(
         sub_type SMALLINT,
-        value NVARCHAR(MAX)
-    ) AS Desciption
+        value NVARCHAR(25)
+    ) AS Payment_Type_Value
+
+
+--4
+USE nyc_taxi_discovery
+SELECT TOP 100 
+    payment_type, sub_type, value
+    --JSON_VALUE(jsonDsc, '$.payment_type') as payment_type,
+    --JSON_VALUE(jsonDsc, '$.payment_type_desc') as payment_type_desc
+FROM
+    OPENROWSET(
+        BULK 'payment_type_array.json',
+        DATA_SOURCE = 'nyc_taxi_data_raw',
+        FORMAT = 'CSV',
+        --PARSER_VERSION = '1.0',--by default csv use PARSER_VERSION = '1.0', with '2.0' coming error because not support json related files
+        --'
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0a'--'0x0b'single line, and '0x0b'-multy line
+    )
+    WITH (
+        jsonDsc nvarchar(MAX)
+    ) AS Payment_Type
+    CROSS APPLY OPENJSON(jsonDsc)
+    WITH(
+        payment_type SMALLINT,
+        payment_type_desc NVARCHAR(MAX) AS JSON
+    ) AS payment_type_desc
+    CROSS APPLY OPENJSON(payment_type_desc)
+    WITH(
+        sub_type SMALLINT,
+        value NVARCHAR(25)
+    ) AS Payment_Type_Value
