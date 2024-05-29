@@ -21,7 +21,7 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'vendor.csv',
-	DATA_SOURCE = 'nyc_taxi_data',
+	DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
         HEADER_ROW = TRUE,
 	PARSER_VERSION = '2.0',
