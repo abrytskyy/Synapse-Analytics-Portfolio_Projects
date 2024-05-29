@@ -1,6 +1,16 @@
 -- This is auto-generated code using HTTPS
 SELECT
-    TOP 10000 *
+    TOP 100 *
+FROM
+    OPENROWSET(
+        BULK 'https://sysnapsedl24.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0'      
+    ) AS [result]
+	
+--adding manually Header Row, Row and Field Terminator
+SELECT
+    TOP 100 *
 FROM
     OPENROWSET(
         BULK 'https://sysnapsedl24.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
@@ -10,8 +20,8 @@ FROM
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     ) AS [result]
-
---This code is written manually using ADFSS, Header Row, Row and Field Terminator 
+	
+--This code is written manually using ADFSS with Header Row, Row and Field Terminator 
 SELECT
     TOP 100 *
 FROM
