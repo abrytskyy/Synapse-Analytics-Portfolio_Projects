@@ -1,4 +1,4 @@
-use nyc_taxi_discovery
+USE nyc_taxi_discovery
 
 SELECT payment_type, sub_type, value
 FROM
