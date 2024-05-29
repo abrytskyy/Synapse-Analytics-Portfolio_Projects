@@ -1,0 +1,25 @@
+use nyc_taxi_discovery
+
+SELECT payment_type, sub_type, value
+FROM
+    OPENROWSET(
+        BULK 'payment_type_array.json',
+        DATA_SOURCE = 'nyc_taxi_data_raw',
+        FORMAT = 'CSV',
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0a'
+    )
+    WITH (
+        jsonDoc nvarchar(MAX)
+    ) AS Payment_Type
+    CROSS APPLY OPENJSON(jsonDoc)
+    WITH(
+        payment_type SMALLINT,
+        payment_type_desc NVARCHAR(MAX) AS json
+    ) AS payment_type_desc
+    CROSS APPLY OPENJSON(payment_type_desc)
+    WITH(
+        sub_type SMALLINT,
+        value NVARCHAR(MAX)
+    ) AS Desciption
