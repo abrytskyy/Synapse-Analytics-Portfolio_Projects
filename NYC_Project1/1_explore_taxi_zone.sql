@@ -128,7 +128,7 @@ FROM
     OPENROWSET(
         BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
@@ -146,7 +146,7 @@ FROM
     OPENROWSET(
         BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
@@ -161,7 +161,7 @@ FROM
     OPENROWSET(
         BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         --HEADER_ROW=TRUE,
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
@@ -174,7 +174,7 @@ FROM
     OPENROWSET(
         BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     )WITH(
@@ -191,7 +191,7 @@ FROM
     OPENROWSET(
         BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     )WITH(
@@ -203,7 +203,7 @@ FROM
 --Create external data source
 CREATE EXTERNAL DATA SOURCE nyc_taxi_data_raw
 WITH (
-		LOCATION = 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/'
+	LOCATION = 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/'
         --USER =
         --PASSWORD =
 	)
@@ -220,9 +220,9 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'taxi_zone_without_header.csv',
-		DATA_SOURCE = 'nyc_taxi_data_raw',
+	DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
-		PARSER_VERSION = '2.0',
+	PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     )WITH(
