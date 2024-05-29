@@ -3,30 +3,32 @@ SELECT
     TOP 100 *
 FROM
     OPENROWSET(
-        BULK 'https://sysnapsedl24.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0'      
     ) AS [result]
+
 	
 --adding manually Header Row, Row and Field Terminator
 SELECT
     TOP 100 *
 FROM
     OPENROWSET(
-        BULK 'https://sysnapsedl24.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     ) AS [result]
+
 	
 --This code is written manually using ADFSS with Header Row, Row and Field Terminator 
 SELECT
     TOP 100 *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
@@ -34,30 +36,19 @@ FROM
         ROWTERMINATOR='\n'
     ) AS [result]
 
+	
 --Examine the data type of taxi zone csv
 EXEC sp_describe_first_result_set N'SELECT
-    TOP 1 *
+    TOP 100 *
 FROM
     OPENROWSET(
-        BULK ''https://sysnapsedl24.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv'',
+        BULK ''https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv'',
         FORMAT = ''CSV'',
         PARSER_VERSION = ''2.0'',
         HEADER_ROW=TRUE
     ) AS [result]'
 
---This code is written manually using ADFSS, Header Row, Row and Field Terminator 
-SELECT
-    TOP 100 *
-FROM
-    OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
-        FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
-        HEADER_ROW=TRUE,
-        FIELDTERMINATOR=',',
-        ROWTERMINATOR='\n'
-    ) AS [result]
-
+	
 --Max length of each column
 SELECT
     Max(len(LocationID)) as len_LocationId,
@@ -66,7 +57,7 @@ SELECT
     Max(len(service_zone)) as len_service_zone
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
@@ -74,12 +65,12 @@ FROM
         ROWTERMINATOR='\n'
     ) AS [result]
 
---Use with clause to provide the explicit data type
+--Use WITH clause to provide the data type and length
 SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
@@ -93,14 +84,16 @@ FROM
         service_zone VARCHAR(15)
     ) AS [result]
 
--- Collation check of database
+-- Collation check of databases
 select name, collation_name from sys.databases
 
+
+--changing COLLATE to UTF8	
 SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
@@ -114,19 +107,26 @@ FROM
         service_zone VARCHAR(15) COLLATE Latin1_General_100_CI_AS_SC_UTF8
     ) AS [result]
 
+	
 --Create new database
 CREATE DATABASE nyc_taxi_discovery
-SELECT NAME, collation_name  FROM sys.databases
 
-use nyc_taxi_discovery
+	
+--alter collate to utf8
+USE nyc_taxi_discovery
 ALTER DATABASE nyc_taxi_discovery COLLATE Latin1_General_100_CI_AS_SC_UTF8
 
---Select specific data set
+	
+--collation check of databases
+SELECT name, collation_name FROM sys.databases
+
+
+--Select data set without header(1)
 SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone.csv',
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
 		PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
@@ -139,15 +139,30 @@ FROM
         service_zone VARCHAR(15)
     ) AS [result]
 	
---Read data withou header 
+--Read data without header 
 SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone_without_header.csv',
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
 		PARSER_VERSION = '2.0',
         HEADER_ROW=TRUE,
+        FIELDTERMINATOR=',',
+        ROWTERMINATOR='\n'
+    ) AS [result]
+
+--In Messages: The column 'EWR' was specified multiple times for 'result'.
+
+--comment HEADER_ROW=TRUE
+SELECT
+    *
+FROM
+    OPENROWSET(
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
+        FORMAT = 'CSV',
+		PARSER_VERSION = '2.0',
+        --HEADER_ROW=TRUE,
         FIELDTERMINATOR=',',
         ROWTERMINATOR='\n'
     ) AS [result]
@@ -157,7 +172,7 @@ SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone_without_header.csv',
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
 		PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
@@ -174,7 +189,7 @@ SELECT
     *
 FROM
     OPENROWSET(
-        BULK 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/taxi_zone_without_header.csv',
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone_without_header.csv',
         FORMAT = 'CSV',
 		PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
@@ -186,16 +201,18 @@ FROM
     ) AS [result]
 	
 --Create external data source
-CREATE EXTERNAL DATA SOURCE nyc_taxi_data
+CREATE EXTERNAL DATA SOURCE nyc_taxi_data_raw
 WITH (
-		LOCATION = 'abfss://nyc-taxi-data@sysnapsedl24.dfs.core.windows.net/raw/'
+		LOCATION = 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/'
+        --USER =
+        --PASSWORD =
 	)
 	
---Drop external data source
-DROP EXTERNAL DATA SOURCE nyc_taxi_data_row
+--Drop external data source(if droping need to create again)
+DROP EXTERNAL DATA SOURCE nyc_taxi_data_raw
 
---Select available external data source
-SELECT * FROM SYS.EXTERNAL_DATA_SOURCES
+--Select available external data source(location, pushdown ON)
+SELECT * FROM sys.external_data_sources
 
 --Read data using external data source
 SELECT
@@ -203,7 +220,7 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'taxi_zone_without_header.csv',
-		DATA_SOURCE = 'nyc_taxi_data_row',
+		DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
 		PARSER_VERSION = '2.0',
         FIELDTERMINATOR=',',
