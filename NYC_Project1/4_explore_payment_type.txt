@@ -1,0 +1,17 @@
+use nyc_taxi_discovery
+
+SELECT
+    JSON_VALUE(jsonDoc, '$.payment_type') as payment_type,
+    JSON_VALUE(jsonDoc, '$.payment_type_desc') as payment_type_desc
+FROM
+    OPENROWSET(
+        BULK 'payment_type.json',
+        DATA_SOURCE = 'nyc_taxi_data_raw',
+        FORMAT = 'CSV',
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0a'
+    )
+    WITH (
+        jsonDoc varchar(MAX)
+    ) AS Payment_Type
