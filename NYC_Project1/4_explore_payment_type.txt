@@ -1,5 +1,33 @@
-use nyc_taxi_discovery
+--1
+-- This is auto-generated code
+SELECT TOP 100
+    jsonContent
+/* --> place the keys that you see in JSON documents in the WITH clause:
+       , JSON_VALUE (jsonContent, '$.key1') AS header1
+       , JSON_VALUE (jsonContent, '$.key2') AS header2
+*/
+FROM
+    OPENROWSET(
+        BULK 'https://dl0527.dfs.core.windows.net/nyc-taxi-data/raw/payment_type.json',
+        FORMAT = 'CSV',
+        FIELDQUOTE = '0x0b',
+        FIELDTERMINATOR ='0x0b',
+        ROWTERMINATOR = '0x0b'
+    )
+    WITH (
+        jsonContent varchar(MAX)
+    ) AS [result]
 
+
+--2
+--check data source
+--1.by query
+SELECT * FROM sys.external_data_sources
+--2.manually: Data -> Workspace -> nyc_taxi_discovery -> External resources -> External data sources
+
+
+--3
+USE nyc_taxi_discovery
 SELECT
     JSON_VALUE(jsonDoc, '$.payment_type') as payment_type,
     JSON_VALUE(jsonDoc, '$.payment_type_desc') as payment_type_desc
