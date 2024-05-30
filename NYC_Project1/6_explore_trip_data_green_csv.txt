@@ -1,4 +1,6 @@
-use nyc_taxi_discovery
+USE nyc_taxi_discovery
+
+-- This is auto-generated code
 SELECT
     TOP 100 *
 FROM
@@ -6,9 +8,10 @@ FROM
         BULK 'trip_data_green_csv/year=2020/month=01/green_tripdata_2020-01.csv',
         DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
+        PARSER_VERSION = '2.0',
         HEADER_ROW = TRUE
     ) AS Trip_Data_Green
+
 
 --------------------
 ---Wild Card Search
@@ -24,16 +27,6 @@ FROM
         HEADER_ROW = TRUE
     ) AS Trip_Data_Green
 
-SELECT
-    TOP 100 *
-FROM
-    OPENROWSET(
-        BULK 'trip_data_green_csv/year=2020/month=01/',
-        DATA_SOURCE = 'nyc_taxi_data_raw',
-        FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
-        HEADER_ROW = TRUE
-    ) AS Trip_Data_Green
 
 SELECT
     TOP 100 *
@@ -50,28 +43,19 @@ SELECT
     TOP 100 *
 FROM
     OPENROWSET(
-        BULK 'trip_data_green_csv/year=*/month=01/*.csv',
+        BULK 'trip_data_green_csv/year=2020/month=*/*.csv',
         DATA_SOURCE = 'nyc_taxi_data_raw',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         HEADER_ROW = TRUE
     ) AS Trip_Data_Green
 
-SELECT
-    TOP 100 *
-FROM
-    OPENROWSET(
-        BULK ('trip_data_green_csv/year=2020/month=01/*.csv',
-              'trip_data_green_csv/year=2020/month=02/*.csv'),
-        DATA_SOURCE = 'nyc_taxi_data_raw',
-        FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
-        HEADER_ROW = TRUE
-    ) AS Trip_Data_Green
 
 -----------------
 ---File Meta Data
 -----------------
+
+--filename()
 SELECT
     TOP 100 
     Trip_Data_Green.filename() AS file_name,
@@ -85,9 +69,10 @@ FROM
         HEADER_ROW = TRUE
     ) AS Trip_Data_Green
 
+
 SELECT
     Trip_Data_Green.filename() AS file_name,
-    COUNT(1) cnt_record
+    COUNT(*) cnt_record--or COUNT(1) cnt_record
 FROM
     OPENROWSET(
         BULK ('trip_data_green_csv/year=*/month=*/*.csv'),
@@ -97,10 +82,26 @@ FROM
         HEADER_ROW = TRUE
     ) AS Trip_Data_Green
 GROUP BY Trip_Data_Green.filename()
+ORDER BY Trip_Data_Green.filename()
 
 ----------------
 ---File Property
 ----------------
+SELECT
+    Trip_Data_Green.filename() AS file_name,
+    Trip_Data_Green.filepath() AS file_path,
+    COUNT(1) cnt_record
+FROM
+    OPENROWSET(
+        BULK ('trip_data_green_csv/year=*/month=*/*.csv'),
+        DATA_SOURCE = 'nyc_taxi_data_raw',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW = TRUE
+    ) AS Trip_Data_Green
+GROUP BY Trip_Data_Green.filename(),  Trip_Data_Green.filepath()
+
+
 SELECT
     Trip_Data_Green.filename() AS file_name,
     Trip_Data_Green.filepath() AS file_path,
