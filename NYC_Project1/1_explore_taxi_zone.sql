@@ -121,6 +121,45 @@ ALTER DATABASE nyc_taxi_discovery COLLATE Latin1_General_100_CI_AS_SC_UTF8
 SELECT name, collation_name FROM sys.databases
 
 
+--changing cardinality of columns
+SELECT
+    *
+FROM
+    OPENROWSET(
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW = TRUE,
+        FIELDTERMINATOR = ',',
+        ROWTERMINATOR = '\n'
+    )
+    WITH (
+        --LocationID SMALLINT,
+        Borough VARCHAR(15) 1,
+        Zone VARCHAR(50),
+        service_zone VARCHAR(15) 
+    ) AS [result]
+
+	
+SELECT
+    *
+FROM
+    OPENROWSET(
+        BULK 'abfss://nyc-taxi-data@dl0527.dfs.core.windows.net/raw/taxi_zone.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW = TRUE,
+        FIELDTERMINATOR = ',',
+        ROWTERMINATOR = '\n'
+    )
+    WITH (
+        --LocationID SMALLINT,
+        Borough VARCHAR(15) 2,--by default stay 2
+        Zone VARCHAR(50) 3,
+        service_zone VARCHAR(15) 4
+    ) AS [result]
+	
+
 --Select data set without header(1)
 SELECT
     *
@@ -199,6 +238,7 @@ FROM
         Zone VARCHAR(50) 3,
         service_zone VARCHAR(15) 4
     ) AS [result]
+
 	
 --Create external data source
 CREATE EXTERNAL DATA SOURCE nyc_taxi_data_raw
@@ -214,6 +254,7 @@ DROP EXTERNAL DATA SOURCE nyc_taxi_data_raw
 --Select available external data source(location, pushdown ON)
 SELECT * FROM sys.external_data_sources
 
+	
 --Read data using external data source
 SELECT
     *
